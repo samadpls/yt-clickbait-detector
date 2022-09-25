@@ -6,7 +6,8 @@ import re
 from scipy.spatial import distance
 from sentence_transformers import SentenceTransformer
 from youtube_transcript_api import YouTubeTranscriptApi
-# @st.cache( allow_output_mutation=True) 
+
+st.set_page_config(page_title="YT-ClickBait Detector", page_icon='images/youtube.png')
 @st.cache(allow_output_mutation=True,suppress_st_warning = True)
 def loading():   
     return SentenceTransformer('distilbert-base-nli-mean-tokens')
@@ -79,13 +80,13 @@ def main():
     with open('styles.css') as f:
         st.markdown(f"<style>{f.read()}</style>",unsafe_allow_html=True)
         
-    st.markdown("""<div><h3><a  style="color:#FFFFFF" href="https://github.com/samadpls/yt-clickbait-detector">star it</a> ⭐</h3></div>""",unsafe_allow_html=True)   
+    st.markdown("""<div><h3><a  style="color:#FFFFFF" href="#">star it</a> ⭐</h3></div>""",unsafe_allow_html=True)   
     
     img , heading =  st.columns([1,5])
     with img:
         st.image('images/youtube.png', width=90)
     with heading:
-        st.markdown('# YouTube Click-Bait Detector')
+        st.markdown('# YouTube ClickBait Detector')
     
     search=st.text_input("Search Video ", '')
     st.markdown("```It only works on Videos having English captions.```")
