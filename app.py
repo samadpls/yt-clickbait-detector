@@ -79,7 +79,7 @@ def main():
     with open('styles.css') as f:
         st.markdown(f"<style>{f.read()}</style>",unsafe_allow_html=True)
         
-    st.markdown("""<div><h3><a  style="color:#FFFFFF" href="#">star it</a> ⭐</h3></div>""",unsafe_allow_html=True)   
+    st.markdown("""<div><h3><a  style="color:#FFFFFF" href="https://github.com/samadpls/yt-clickbait-detector">star it</a> ⭐</h3></div>""",unsafe_allow_html=True)   
     
     img , heading =  st.columns([1,5])
     with img:
