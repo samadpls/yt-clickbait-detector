@@ -1,4 +1,4 @@
-<img src='images/header.png' alt='header'><br>
+<img src='images/header.PNG' alt='header'><br>
 
 + Youtube click-bait detector is a web application that suggests top recommended videos based on passing a machine learning test.
 ## Demo
