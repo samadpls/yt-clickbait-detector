@@ -1,7 +1,7 @@
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/samadpls/yt-clickbait-detector?style=social)
 
-<img src='images/header.PNG' alt='header'><br>
+<img src='images/header.PNG' alt='header'>
 
 + Youtube click-bait detector is a web application that suggests top recommended videos based on passing a machine learning test.
 ## Demo:
