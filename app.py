@@ -80,7 +80,7 @@ def main():
     with open('styles.css') as f:
         st.markdown(f"<style>{f.read()}</style>",unsafe_allow_html=True)
         
-    st.markdown("""<a href='https://github.com/samadpls/yt-clickbait-detector'><img src='https://img.shields.io/github/stars/samadpls/yt-clickbait-detector?style=social'></a>""",unsafe_allow_html=True)    
+    st.markdown("""<a href='https://github.com/samadpls/yt-clickbait-detector'><img src='https://img.shields.io/github/stars/samadpls/yt-clickbait-detector?color=red&label=star%20me&logoColor=red&style=social'></a>""",unsafe_allow_html=True)    
     img , heading =  st.columns([1,5])
     with img:
         st.image('images/youtube.png', width=90)
