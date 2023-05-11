@@ -2,3 +2,4 @@ scipy==1.9.1
 sentence_transformers==2.2.2
 streamlit==1.13.0
 youtube_transcript_api==0.4.4
+altair==4.1.0

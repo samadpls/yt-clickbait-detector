@@ -7,13 +7,12 @@ from scipy.spatial import distance
 from sentence_transformers import SentenceTransformer
 from youtube_transcript_api import YouTubeTranscriptApi
 
-st.set_page_config(page_title="YT-ClickBait Detector", page_icon='images/youtube.png')
+
 @st.cache(allow_output_mutation=True,suppress_st_warning = True)
-def loading():   
-    return SentenceTransformer('distilbert-base-nli-mean-tokens')
-   
-        
 def checking(search):
+    with st.spinner("Fetching results..."):
+        def loading():
+            return SentenceTransformer('distilbert-base-nli-mean-tokens')
     
     model =loading() 
 
@@ -22,61 +21,44 @@ def checking(search):
     
     html= urllib.request.urlopen(f"https://www.youtube.com/results?search_query={search}")
     videos=list(set(re.findall("watch\?v=(\S{11})",html.read().decode())))
-    for  VideoID in videos[:10]:
-        params = {"format": "json", "url": "https://www.youtube.com/watch?v=%s" % VideoID}
-        url = "https://www.youtube.com/oembed"
-        query_string = urllib.parse.urlencode(params)
-        url = url + "?" + query_string
-        ten+=10
-        progresss.progress(ten)
-        
-
-       
-        try:
-            with urllib.request.urlopen(url) as response:
-                response_text = response.read()
-                data = json.loads(response_text.decode())
-        except:
-            st.info("Refresh your browser")
-        
-        try:
-            caption = YouTubeTranscriptApi.get_transcript(VideoID,languages=['en'])
-            # print(data['title'])
-            output.append(data['title'].lower())
-            output.append(" ".join(caption[i]['text'] for i in range(len(caption))).lower())
-            urls.append(VideoID)
-        
-        except Exception as e:
-            pass
-    if output:
-        result=[]
-        for sentence in range(0,len(output),2):
-            sentence_embeddings = model.encode([output[sentence],output[sentence+1]])
-            value= 1 - distance.cosine(sentence_embeddings[0], sentence_embeddings[1])
-            result.append(value)
+    for video_id in videos[:10]:
+            ten+=10
+            progresss.progress(ten)
             
-            # print(result)
-        valid=[urls[index] for index in range(len( result)) if result[index] >0.5]
-        if valid:
-            if len(valid)>=3:
-                st.components.v1.iframe(src=f"https://www.youtube.com/embed/{valid[0]}", height=300)
-                st.components.v1.iframe(src=f"https://www.youtube.com/embed/{valid[1]}", height=300)
-                st.components.v1.iframe(src=f"https://www.youtube.com/embed/{valid[2]}", height=300)
-                st.success("made with 🤍 by samadpls")
-            elif len(valid)==2:
-                st.components.v1.iframe(src=f"https://www.youtube.com/embed/{valid[0]}", height=300)
-                st.components.v1.iframe(src=f"https://www.youtube.com/embed/{valid[1]}", height=300)
-                st.success("made with 🤍 by samadpls")  
-            else:
-                st.components.v1.iframe(src=f"https://www.youtube.com/embed/{valid[0]}", height=300) 
-                st.success("made with 🤍 by samadpls")     
-        else:
-            st.error('Sorry! could not able to find a valid video', icon="😔")
+            url = f"https://www.youtube.com/oembed?format=json&url=https://www.youtube.com/watch?v={video_id}"
+            try:
+                with urllib.request.urlopen(url) as response:
+                    response_text = response.read()
+                    data = json.loads(response_text.decode())
+            except urllib.error.URLError:
+                st.error('Unable to connect to the internet. Please check your connection.')
+                return
+
+            try:
+                caption = YouTubeTranscriptApi.get_transcript(video_id, languages=['en'])
+                output.append(data['title'].lower())
+                output.append(" ".join(caption[i]['text'] for i in range(len(caption))).lower())
+                urls.append(video_id)
+
+            except Exception as e:
+                pass
+   
+    if output:
+        similarities = []
+        for sentence in range(0, len(output), 2):
+            sentence_embeddings = model.encode([output[sentence], output[sentence+1]])
+            value = 1 - distance.cosine(sentence_embeddings[0], sentence_embeddings[1])
+            similarities.append(value)
+
+        return [urls[index] for index in range(len(similarities)) if similarities[index] > 0.5]
+   
     else:
         st.error('Unable to find videos in English', icon="😔")
 
 
 def main():
+    st.set_page_config(page_title="YT-ClickBait Detector", page_icon='images/youtube.png')
+
     with open('styles.css') as f:
         st.markdown(f"<style>{f.read()}</style>",unsafe_allow_html=True)
         
@@ -90,7 +72,14 @@ def main():
     search=st.text_input("Search Video ", '')
     st.markdown("```It only works on Videos having English captions.```")
     if search:
-        checking(search.strip().replace(' ', '+'))
+        valid_urls= checking(search.strip().replace(' ', '+'))
+        if valid_urls:
+                for i, valid_url in enumerate(valid_urls[:3]):
+                    st.components.v1.iframe(src=f"https://www.youtube.com/embed/{valid_url}", height=300)
+
+       
+        else:
+            st.error('Sorry! could not able to find a valid video', icon="😔")
     
 
 if __name__=="__main__":
